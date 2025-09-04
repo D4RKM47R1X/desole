@@ -5,7 +5,7 @@ const ctx = canvas.getContext('2d');
 canvas.width = 800;
 canvas.height = 400;
 
-// Player
+// Player settings
 const player = {
   x: 50,
   y: 300,
@@ -13,8 +13,8 @@ const player = {
   height: 30,
   color: 'red',
   dy: 0,
-  gravity: 0.5,
-  jumpPower: -10,
+  gravity: 0.6,
+  jumpPower: -12,
   grounded: false,
   speed: 3
 };
@@ -26,9 +26,8 @@ const platforms = [
   { x: 400, y: 220, width: 100, height: 20, color: '#654321' }
 ];
 
+// Key tracking
 const keys = {};
-
-// Listen for key events
 document.addEventListener('keydown', e => keys[e.code] = true);
 document.addEventListener('keyup', e => keys[e.code] = false);
 
@@ -41,26 +40,36 @@ function update() {
   player.dy += player.gravity;
   player.y += player.dy;
 
-  // Jump
+  // Assume player is in the air until collision is detected
+  player.grounded = false;
+
+  // Collision detection with platforms
+  for (let plat of platforms) {
+    if (
+      player.x < plat.x + plat.width &&
+      player.x + player.width > plat.x &&
+      player.y + player.height > plat.y &&
+      player.y + player.height - player.dy <= plat.y // landing check
+    ) {
+      // Snap player to the platform top
+      player.y = plat.y - player.height;
+      player.dy = 0;
+      player.grounded = true;
+    }
+  }
+
+  // Jumping logic
   if (keys['Space'] && player.grounded) {
     player.dy = player.jumpPower;
     player.grounded = false;
   }
 
-  // Collision detection
-  player.grounded = false;
-  platforms.forEach(plat => {
-    if (
-      player.x < plat.x + plat.width &&
-      player.x + player.width > plat.x &&
-      player.y + player.height > plat.y &&
-      player.y + player.height < plat.y + plat.height + player.dy
-    ) {
-      player.y = plat.y - player.height;
-      player.dy = 0;
-      player.grounded = true;
-    }
-  });
+  // Respawn if falling off the screen
+  if (player.y > canvas.height) {
+    player.x = 50;
+    player.y = 300;
+    player.dy = 0;
+  }
 }
 
 function draw() {
@@ -71,10 +80,10 @@ function draw() {
   ctx.fillRect(player.x, player.y, player.width, player.height);
 
   // Draw platforms
-  platforms.forEach(plat => {
+  for (let plat of platforms) {
     ctx.fillStyle = plat.color;
     ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
-  });
+  }
 }
 
 function gameLoop() {
