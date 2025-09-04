@@ -28,8 +28,18 @@ const platforms = [
 
 // Key tracking
 const keys = {};
-document.addEventListener('keydown', e => keys[e.code] = true);
-document.addEventListener('keyup', e => keys[e.code] = false);
+document.addEventListener('keydown', e => {
+  keys[e.code] = true;
+
+  // Prevent space and arrow key default scrolling
+  if (e.code === 'Space' || e.code === 'ArrowUp') {
+    e.preventDefault();
+  }
+});
+
+document.addEventListener('keyup', e => {
+  keys[e.code] = false;
+});
 
 function update() {
   // Horizontal movement
@@ -40,31 +50,31 @@ function update() {
   player.dy += player.gravity;
   player.y += player.dy;
 
-  // Assume player is in the air until collision is detected
+  // Assume player is falling unless collision detected
   player.grounded = false;
 
-  // Collision detection with platforms
+  // Collision detection
   for (let plat of platforms) {
     if (
       player.x < plat.x + plat.width &&
       player.x + player.width > plat.x &&
       player.y + player.height > plat.y &&
-      player.y + player.height - player.dy <= plat.y // landing check
+      player.y + player.height - player.dy <= plat.y
     ) {
-      // Snap player to the platform top
+      // Land on platform
       player.y = plat.y - player.height;
       player.dy = 0;
       player.grounded = true;
     }
   }
 
-  // Jumping logic
-  if (keys['Space'] && player.grounded) {
+  // Jumping logic (Space OR Up Arrow)
+  if ((keys['Space'] || keys['ArrowUp']) && player.grounded) {
     player.dy = player.jumpPower;
     player.grounded = false;
   }
 
-  // Respawn if falling off the screen
+  // Respawn if falling off-screen
   if (player.y > canvas.height) {
     player.x = 50;
     player.y = 300;
