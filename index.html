@@ -557,7 +557,7 @@
             <div class="cube-gates-container">
                 <div class="gate-box red">
                     <div class="gate-header">
-                        <h3><i class="fas fa-border-all"></i> RED GATE</h3>
+                        <h3><i class="fas fa-border-all"></i> FIRST GATE</h3>
                         <i  title="Aligns the cube's edge pieces"></i>
                     </div>
                     <input type="number" id="redValue" class="gate-input red-input" placeholder="Enter edge alignment">
@@ -566,7 +566,7 @@
 
                 <div class="gate-box yellow">
                     <div class="gate-header">
-                        <h3><i class="fas fa-square-full"></i> YELLOW GATE</h3>
+                        <h3><i class="fas fa-square-full"></i> SECOND GATE</h3>
                         <i  title="Positions the cube's corner pieces"></i>
                     </div>
                     <input type="number" id="yellowValue" class="gate-input yellow-input" placeholder="Enter corner position">
@@ -575,7 +575,7 @@
 
                 <div class="gate-box blue">
                     <div class="gate-header">
-                        <h3><i class="fas fa-circle"></i> BLUE GATE</h3>
+                        <h3><i class="fas fa-circle"></i> THIRD GATE</h3>
                         <i  title="Rotates the cube's center pieces"></i>
                     </div>
                     <input type="number" id="blueValue" class="gate-input blue-input" placeholder="Enter center rotation">
@@ -671,7 +671,7 @@
                 // Check if all values are correct
                 if (redValue === '40' && yellowValue === '110' && blueValue === '4') {
                     // Correct values - redirect to next page
-                    window.location.href = '/il.html';
+                    window.location.href = 'il.html';
                 } else {
                     // Incorrect values - show cube reset warning
                     showCubeResetWarning();
