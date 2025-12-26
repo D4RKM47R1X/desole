@@ -6,7 +6,7 @@
     <title>Rubix Gates | Identity Verification</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* WARNING: The cube remembers all who pass. Identity is the final lock. */
+        /* WARNING: The cube recognizes only one. Identity is the final permutation. */
         
         * {
             margin: 0;
@@ -43,8 +43,6 @@
                 repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(157, 78, 221, 0.02) 2px, rgba(157, 78, 221, 0.02) 4px);
         }
 
-        /* WARNING: Identity is the final permutation. Only two names unlock the timer. */
-        
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -99,8 +97,6 @@
             color: var(--purple);
         }
 
-        /* WARNING: The timer ticks toward convergence. 27th December 2025 at midnight. */
-        
         .main-content {
             display: flex;
             flex-direction: column;
@@ -156,8 +152,6 @@
             margin-right: auto;
         }
 
-        /* WARNING: Only the chosen one may pass. The cube recognizes its creator and itself. */
-        
         .identity-gate {
             display: flex;
             flex-direction: column;
@@ -240,8 +234,6 @@
             transform: translateY(0);
         }
 
-        /* WARNING: The timer appears only to the worthy. 27th December 2025. The convergence point. */
-        
         .timer-container {
             display: none;
             width: 100%;
@@ -329,8 +321,99 @@
             border: 1px solid rgba(157, 78, 221, 0.2);
         }
 
-        /* WARNING: The floating cubes guard the timer. They accelerate as convergence approaches. */
-        
+        /* Proceed button that appears after countdown */
+        .proceed-container {
+            display: none;
+            width: 100%;
+            max-width: 900px;
+            margin-top: 40px;
+            text-align: center;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .proceed-title {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: var(--purple);
+            text-shadow: 0 0 20px rgba(157, 78, 221, 0.5);
+        }
+
+        .proceed-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .proceed-btn {
+            background: linear-gradient(90deg, var(--green), #2dd4bf);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 22px 60px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 25px rgba(74, 222, 128, 0.4), 0 0 30px rgba(74, 222, 128, 0.2);
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 20px;
+            text-transform: uppercase;
+        }
+
+        .proceed-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.8s;
+        }
+
+        .proceed-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(74, 222, 128, 0.6), 0 0 40px rgba(74, 222, 128, 0.3);
+        }
+
+        .proceed-btn:hover::before {
+            left: 100%;
+        }
+
+        .proceed-btn:active {
+            transform: translateY(-2px);
+        }
+
+        .convergence-message {
+            font-size: 1.4rem;
+            color: var(--yellow);
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 217, 61, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 217, 61, 0.2);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { 
+                box-shadow: 0 0 20px rgba(255, 217, 61, 0.1);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 40px rgba(255, 217, 61, 0.3);
+                transform: scale(1.02);
+            }
+        }
+
         .floating-cubes {
             position: fixed;
             top: 0;
@@ -412,8 +495,6 @@
             100% { top: 85%; left: 15%; transform: rotate(630deg); }
         }
 
-        /* WARNING: Identity confirmed. The countdown begins. 27th December 2025 at 00:00:00 UTC. */
-        
         .identity-hint {
             margin-top: 30px;
             font-size: 0.9rem;
@@ -421,6 +502,7 @@
             font-style: italic;
             max-width: 500px;
             text-align: center;
+            display: none; /* Hidden for cryptic challenge */
         }
 
         footer {
@@ -455,8 +537,77 @@
             font-style: italic;
         }
 
-        /* WARNING: The cube accelerates time perception. The timer is the final gate. */
-        
+        .error-message {
+            color: var(--red);
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .cube-visual {
+            width: 100px;
+            height: 100px;
+            margin: 20px auto;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-20deg) rotateY(-20deg);
+            animation: rotate-visual 30s infinite linear;
+        }
+
+        .cube-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 2px;
+            padding: 2px;
+        }
+
+        .cube-face.front { 
+            transform: translateZ(50px);
+            background: rgba(157, 78, 221, 0.05);
+        }
+        .cube-face.back { 
+            transform: rotateY(180deg) translateZ(50px);
+            background: rgba(255, 107, 107, 0.05);
+        }
+        .cube-face.right { 
+            transform: rotateY(90deg) translateZ(50px);
+            background: rgba(255, 217, 61, 0.05);
+        }
+        .cube-face.left { 
+            transform: rotateY(-90deg) translateZ(50px);
+            background: rgba(107, 197, 255, 0.05);
+        }
+        .cube-face.top { 
+            transform: rotateX(90deg) translateZ(50px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .cube-face.bottom { 
+            transform: rotateX(-90deg) translateZ(50px);
+            background: rgba(199, 125, 255, 0.05);
+        }
+
+        .cube-piece {
+            border-radius: 3px;
+        }
+
+        @keyframes rotate-visual {
+            0% { transform: rotateX(-20deg) rotateY(0deg); }
+            100% { transform: rotateX(-20deg) rotateY(360deg); }
+        }
+
         @media (max-width: 768px) {
             .gatekeeper-container {
                 padding: 30px 20px;
@@ -489,14 +640,19 @@
                 align-items: center;
                 gap: 10px;
             }
+            
+            .proceed-btn {
+                padding: 18px 40px;
+                font-size: 1.3rem;
+            }
+            
+            .proceed-title {
+                font-size: 1.8rem;
+            }
         }
-
-        /* WARNING: Time dilation increases near convergence. The cubes move faster. */
     </style>
 </head>
 <body>
-    <!-- WARNING: Identity verification required. Only Only the chosen one may pass may proceed. -->
-    
     <div class="floating-cubes">
         <img src="images\186-1864728_freddy-fazbear-fnaf-freddy-head-pixel-art.png" class="floating-cube cube1" alt="Cube Icon">
         <img src="images\Triforce.webp" class="floating-cube cube2" alt="Cube Icon">
@@ -508,7 +664,8 @@
     <div class="container">
         <header>
             <div class="logo">
-                <span>AH SO YOU'RE NOT A FRAUD</span>
+                <i class="fas fa-cube"></i>
+                <span>RUBIX GATES</span>
             </div>
             <div class="gate-badge">
                 <i class="fas fa-user-lock"></i>
@@ -520,24 +677,27 @@
             <div class="gatekeeper-container">
                 <h1 class="gatekeeper-title">WHO GOES THERE?</h1>
                 <p class="gatekeeper-subtitle">
-                    The cube recognizes only the best. They must HAVE MET THE CREATOR ON THE ILIWK QRYHPEHU WZR WKRXVDQG DQG WZHQWB WZR. Speak your name to reveal the convergence timer.
-                    All others shall be turned away.
+                    The cube demands identity verification. Speak the name it recognizes to proceed.
                 </p>
+                
+                <div class="cube-visual">
+                    <!-- Cube will be generated by JavaScript -->
+                </div>
                 
                 <div class="identity-gate">
                     <div class="identity-input-container">
-                        <input type="text" id="identityInput" class="identity-input" placeholder="Enter your name" autocomplete="off">
+                        <input type="text" id="identityInput" class="identity-input" placeholder="" autocomplete="off" autofocus>
                     </div>
+                    <div class="error-message" id="errorMessage">UNRECOGNIZED</div>
                     <button id="verifyIdentityBtn" class="submit-identity-btn">
                         <i class="fas fa-key"></i> VERIFY IDENTITY
                     </button>
-                    <p class="identity-hint">The cube responds only to the chosen one (case insensitive)</p>
                 </div>
                 
                 <div class="timer-container" id="timerContainer">
                     <h2 class="timer-title">CONVERGENCE TIMER</h2>
                     <p class="timer-subtitle">
-                        The cube converges at midnight, December 27th, 2025. All permutations align at this moment.
+                        The cube converges at midnight GMT+2, December 27th, 2025. All permutations align at this moment.
                     </p>
                     
                     <div class="timer-display">
@@ -560,43 +720,81 @@
                     </div>
                     
                     <div class="target-date" id="targetDate">
-                        Target: December 27, 2025 at 00:00:00 UTC
+                        Target: December 27, 2025 at 00:00:00 GMT+2
                     </div>
                 </div>
+                
+                <!-- New proceed section that appears after countdown -->
+                <div class="proceed-container" id="proceedContainer">
+                    <h2 class="proceed-title">CONVERGENCE ACHIEVED</h2>
+                    <p class="proceed-subtitle">
+                        The cube's permutations have aligned. The gates are now synchronized.
+                    </p>
+                    
+                    <div class="convergence-message" id="convergenceMessage">
+                        All 43 quintillion permutations have resolved to unity.<br>
+                        The Rubix algorithm is complete.
+                    </div>
+                    
+                    <button id="proceedBtn" class="proceed-btn">
+                        <i class="fas fa-arrow-right"></i> PROCEED TO FINAL GATE
+                    </button>
+                </div>
             </div>
-            
-            <p class="hidden-warnings">WARNING: The timer accelerates perception. Convergence approaches at 43 quintillion permutations per second.</p>
         </main>
 
         <footer>
-            <p>HBD &copy; <span id="currentYear"></span> | Identity Verification | Convergence: 27/12/2025</p>
+            <p>HBD world tour &copy; <span id="currentYear"></span> | Identity Verification | Convergence: 27/12/2025 GMT+2</p>
             <div class="gate-status">
-                <div class="status">Difficulty: Coughing child</div>
+                <div class="status">Algorithm: COMPLETE</div>
                 <div class="status">Identity: <span id="identityStatus">PENDING</span></div>
                 <div class="status">Timer: <span id="timerStatus">HIDDEN</span></div>
             </div>
-            <p class="hidden-warnings">WARNING: Time distortion increases near convergence. The cubes move faster as midnight approaches.</p>
         </footer>
     </div>
 
     <script>
-        // WARNING: Identity verification active. Only the chosen may proceed.
-        // Case insensitive. The cube knows its creator and itself.
-        
         document.addEventListener('DOMContentLoaded', function() {
             // Set current year in footer
             document.getElementById('currentYear').textContent = new Date().getFullYear();
             
-            // Show hidden warnings randomly
-            const warnings = document.querySelectorAll('.hidden-warnings');
-            warnings.forEach(warning => {
-                if (Math.random() > 0.7) {
-                    warning.style.display = 'block';
-                    setTimeout(() => {
-                        warning.style.display = 'none';
-                    }, 5000);
+            // Generate cube pieces
+            const cubeVisual = document.querySelector('.cube-visual');
+            const cubeFaces = ['front', 'back', 'right', 'left', 'top', 'bottom'];
+            
+            cubeFaces.forEach(face => {
+                const faceElement = document.createElement('div');
+                faceElement.className = `cube-face ${face}`;
+                
+                // Create 9 pieces per face
+                for (let i = 0; i < 9; i++) {
+                    const piece = document.createElement('div');
+                    piece.className = 'cube-piece';
+                    
+                    // Assign colors based on face position
+                    if (face === 'front') {
+                        piece.style.backgroundColor = `rgba(157, 78, 221, ${0.2 + Math.random() * 0.3})`;
+                    } else if (face === 'back') {
+                        piece.style.backgroundColor = `rgba(255, 107, 107, ${0.2 + Math.random() * 0.3})`;
+                    } else if (face === 'right') {
+                        piece.style.backgroundColor = `rgba(255, 217, 61, ${0.2 + Math.random() * 0.3})`;
+                    } else if (face === 'left') {
+                        piece.style.backgroundColor = `rgba(107, 197, 255, ${0.2 + Math.random() * 0.3})`;
+                    } else if (face === 'top') {
+                        piece.style.backgroundColor = `rgba(255, 255, 255, ${0.1 + Math.random() * 0.2})`;
+                    } else if (face === 'bottom') {
+                        piece.style.backgroundColor = `rgba(199, 125, 255, ${0.2 + Math.random() * 0.3})`;
+                    }
+                    
+                    faceElement.appendChild(piece);
                 }
+                
+                cubeVisual.appendChild(faceElement);
             });
+            
+            // Variables for timer control
+            let countdownInterval;
+            let isTimerExpired = false;
             
             // Identity verification functionality
             document.getElementById('verifyIdentityBtn').addEventListener('click', verifyIdentity);
@@ -608,19 +806,22 @@
                 }
             });
             
-            // WARNING: The cube recognizes:??
-            // Case insensitive. All other identities are rejected.
+            // Proceed button functionality
+            document.getElementById('proceedBtn').addEventListener('click', function() {
+                window.location.href = 'i.html';
+            });
             
             function verifyIdentity() {
                 const identityInput = document.getElementById('identityInput').value.trim();
                 const identityStatus = document.getElementById('identityStatus');
                 const timerStatus = document.getElementById('timerStatus');
+                const errorMessage = document.getElementById('errorMessage');
                 
-                // Normalize input (lowercase, remove extra spaces)
-                const normalizedInput = identityInput.toLowerCase().replace(/\s+/g, ' ');
+                // Normalize input (lowercase)
+                const normalizedInput = identityInput.toLowerCase();
                 
-                // Check if identity is valid
-                if (normalizedInput === 'nkandu' || normalizedInput === 'rubix cube') {
+                // Only accept "Nkandu" (case insensitive, no hints about Rubix Cube)
+                if (normalizedInput === 'nkandu') {
                     // Valid identity - show timer and update status
                     identityStatus.textContent = 'VERIFIED';
                     identityStatus.style.color = '#4ade80';
@@ -628,39 +829,59 @@
                     timerStatus.textContent = 'ACTIVE';
                     timerStatus.style.color = '#4ade80';
                     
+                    errorMessage.style.display = 'none';
+                    
                     // Show timer container
                     const timerContainer = document.getElementById('timerContainer');
                     timerContainer.style.display = 'block';
                     
+                    // Hide input and button
+                    document.getElementById('identityInput').style.display = 'none';
+                    document.getElementById('verifyIdentityBtn').style.display = 'none';
+                    
+                    // Update question
+                    document.querySelector('.gatekeeper-title').textContent = 'IDENTITY CONFIRMED';
+                    document.querySelector('.gatekeeper-subtitle').textContent = 'The cube recognizes you. The convergence timer is revealed.';
+                    
                     // Start countdown timer
                     startCountdown();
                     
-                    // Show success message
-                    showIdentitySuccess(identityInput);
-                    
                     // Accelerate floating cubes
                     accelerateCubes();
+                    
                 } else {
                     // Invalid identity - show error
                     identityStatus.textContent = 'REJECTED';
                     identityStatus.style.color = '#ff6b6b';
                     
-                    showIdentityError();
+                    errorMessage.style.display = 'block';
+                    errorMessage.style.animation = 'none';
+                    void errorMessage.offsetWidth; // Trigger reflow
+                    errorMessage.style.animation = 'shake 0.5s';
+                    
+                    // Clear input field
+                    document.getElementById('identityInput').value = '';
+                    document.getElementById('identityInput').focus();
+                    
+                    // Shake input field
+                    const inputField = document.getElementById('identityInput');
+                    inputField.style.animation = 'none';
+                    void inputField.offsetWidth;
+                    inputField.style.animation = 'shake 0.5s';
                 }
             }
             
-            // WARNING: Convergence at midnight, December 27th, 2025
-            // The timer counts down to the moment of alignment
-            
             function startCountdown() {
-                // Set target date: December 27, 2025 at midnight CAT
+                // Set target date: December 27, 2025 at midnight GMT+2
+                // GMT+2 is UTC+2, so we need to calculate the UTC time
+                // December 27, 2025 00:00:00 GMT+2 = December 26, 2025 22:00:00 UTC
                 const targetDate = new Date('December 26, 2025 22:00:00 UTC');
                 
                 // Update timer immediately
                 updateCountdown(targetDate);
                 
                 // Update timer every second
-                const countdownInterval = setInterval(() => {
+                countdownInterval = setInterval(() => {
                     updateCountdown(targetDate);
                 }, 1000);
             }
@@ -668,6 +889,23 @@
             function updateCountdown(targetDate) {
                 const now = new Date();
                 const timeRemaining = targetDate - now;
+                
+                // If countdown has finished
+                if (timeRemaining <= 0 && !isTimerExpired) {
+                    isTimerExpired = true;
+                    clearInterval(countdownInterval);
+                    
+                    // Show all zeros
+                    document.getElementById('days').textContent = '000';
+                    document.getElementById('hours').textContent = '00';
+                    document.getElementById('minutes').textContent = '00';
+                    document.getElementById('seconds').textContent = '00';
+                    
+                    // Show convergence achieved
+                    showConvergenceAchieved();
+                    
+                    return;
+                }
                 
                 // Calculate days, hours, minutes, seconds
                 const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
@@ -681,181 +919,110 @@
                 document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
                 document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
                 
+                // Add visual pulse when seconds update
+                const secondsElement = document.getElementById('seconds');
+                secondsElement.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    secondsElement.style.transform = 'scale(1)';
+                }, 200);
+                
                 // Update target date display
                 const targetDateElement = document.getElementById('targetDate');
-                const options = { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    timeZoneName: 'short'
-                };
-                targetDateElement.textContent = `Convergence: ${targetDate.toLocaleDateString('en-US', options)}`;
+                targetDateElement.textContent = `Convergence: December 27, 2025 at 00:00:00 GMT+2`;
                 
-                // Add visual effect when under 10 seconds on any unit
-                if (days < 10 || hours < 10 || minutes < 10 || seconds < 10) {
-                    document.querySelectorAll('.timer-value').forEach(value => {
-                        value.style.animation = 'pulse 1s infinite';
-                    });
+                // Update timer status in footer
+                const timerStatus = document.getElementById('timerStatus');
+                if (days < 1) {
+                    timerStatus.textContent = 'IMMINENT';
+                    timerStatus.style.color = '#ffd93d';
                 }
             }
             
-            function showIdentitySuccess(identity) {
-                // Create success overlay
-                const successOverlay = document.createElement('div');
-                successOverlay.style.position = 'fixed';
-                successOverlay.style.top = '0';
-                successOverlay.style.left = '0';
-                successOverlay.style.width = '100%';
-                successOverlay.style.height = '100%';
-                successOverlay.style.backgroundColor = 'rgba(13, 17, 23, 0.95)';
-                successOverlay.style.display = 'flex';
-                successOverlay.style.justifyContent = 'center';
-                successOverlay.style.alignItems = 'center';
-                successOverlay.style.zIndex = '1000';
-                successOverlay.style.flexDirection = 'column';
-                successOverlay.style.fontFamily = "'Courier New', monospace";
+            function showConvergenceAchieved() {
+                // Hide timer container
+                const timerContainer = document.getElementById('timerContainer');
+                timerContainer.style.display = 'none';
                 
-                // Create success text
-                const successText = document.createElement('div');
-                successText.innerHTML = `
-                    <div style="text-align: center; max-width: 700px;">
-                        <div style="font-size: 5rem; margin-bottom: 30px; color: #4ade80;">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <h1 style="color: #4ade80; font-size: 2.8rem; margin-bottom: 20px; text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);">
-                            IDENTITY CONFIRMED
-                        </h1>
-                        <p style="color: #c9d1d9; font-size: 1.5rem; margin-bottom: 20px;">
-                            HAPPY BIRTHDAY!!!! <span style="color: #9d4edd; font-weight: bold;">${identity}</span> YOU BETTER HAVE A GREAT DAY.
-                        </p>
-                        <p style="color: #ffd93d; font-size: 1.2rem; margin-bottom: 30px;">
-                            You're probably feeling silly that it was that simple, as predicted. I'm happy your journey is not over...in more ways than one. That being said the convergence timer has been revealed.<br>
-                            December 27th, 2025 at midnight. Something might happen.
-                        </p>
-                        <p style="color: #6bc5ff; font-size: 1rem; font-style: italic; max-width: 600px;">
-                            The cube recognizes its ${identity.toLowerCase() === 'nkandu' ? 'creator' : 'self'}.<br>
-                            Time distortion increases as convergence approaches.
-                        </p>
-                    </div>
+                // Show proceed container
+                const proceedContainer = document.getElementById('proceedContainer');
+                proceedContainer.style.display = 'block';
+                
+                // Update timer status in footer
+                const timerStatus = document.getElementById('timerStatus');
+                timerStatus.textContent = 'CONVERGED';
+                timerStatus.style.color = '#4ade80';
+                
+                // Update convergence message based on actual time
+                const now = new Date();
+                const message = document.getElementById('convergenceMessage');
+                message.innerHTML = `
+                    Convergence achieved at ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}.<br>
+                    All 43 quintillion permutations have resolved to unity.
                 `;
                 
-                // Create close button
-                const closeButton = document.createElement('button');
-                closeButton.textContent = 'PROCEED TO TIMER';
-                closeButton.style.marginTop = '40px';
-                closeButton.style.padding = '15px 40px';
-                closeButton.style.fontSize = '1.2rem';
-                closeButton.style.backgroundColor = '#4ade80';
-                closeButton.style.color = '#0d1117';
-                closeButton.style.border = 'none';
-                closeButton.style.borderRadius = '8px';
-                closeButton.style.cursor = 'pointer';
-                closeButton.style.fontWeight = 'bold';
-                closeButton.style.letterSpacing = '1px';
-                closeButton.style.boxShadow = '0 0 20px rgba(74, 222, 128, 0.5)';
-                closeButton.addEventListener('click', function() {
-                    document.body.removeChild(successOverlay);
+                // Extreme acceleration of floating cubes
+                const cubes = document.querySelectorAll('.floating-cube');
+                cubes.forEach(cube => {
+                    // Get current animation duration
+                    const style = window.getComputedStyle(cube);
+                    const animationDuration = parseFloat(style.animationDuration);
+                    
+                    // Speed up dramatically
+                    const newDuration = animationDuration * 0.2;
+                    cube.style.animationDuration = `${newDuration}s`;
+                    cube.style.filter = 'hue-rotate(120deg) drop-shadow(0 0 15px rgba(74, 222, 128, 0.5))';
                 });
                 
-                // Add CSS for pulse animation
-                const style = document.createElement('style');
-                style.textContent = `
-                    @keyframes pulse {
-                        0%, 100% { opacity: 1; transform: scale(1); }
-                        50% { opacity: 0.8; transform: scale(1.05); }
-                    }
-                `;
-                document.head.appendChild(style);
-                
-                // Add elements to overlay
-                successOverlay.appendChild(successText);
-                successOverlay.appendChild(closeButton);
-                
-                // Add overlay to body
-                document.body.appendChild(successOverlay);
-                
-                // Remove overlay after 5 seconds if not manually closed
+                // Add celebration effect
                 setTimeout(() => {
-                    if (document.body.contains(successOverlay)) {
-                        document.body.removeChild(successOverlay);
+                    // Create celebration particles
+                    for (let i = 0; i < 20; i++) {
+                        createCelebrationParticle();
                     }
-                }, 5000);
+                }, 500);
             }
             
-            function showIdentityError() {
-                // Create error overlay
-                const errorOverlay = document.createElement('div');
-                errorOverlay.style.position = 'fixed';
-                errorOverlay.style.top = '0';
-                errorOverlay.style.left = '0';
-                errorOverlay.style.width = '100%';
-                errorOverlay.style.height = '100%';
-                errorOverlay.style.backgroundColor = 'rgba(13, 17, 23, 0.95)';
-                errorOverlay.style.display = 'flex';
-                errorOverlay.style.justifyContent = 'center';
-                errorOverlay.style.alignItems = 'center';
-                errorOverlay.style.zIndex = '1000';
-                errorOverlay.style.flexDirection = 'column';
-                errorOverlay.style.fontFamily = "'Courier New', monospace";
+            function createCelebrationParticle() {
+                const particle = document.createElement('div');
+                particle.style.position = 'fixed';
+                particle.style.width = '10px';
+                particle.style.height = '10px';
+                particle.style.backgroundColor = ['#4ade80', '#9d4edd', '#ffd93d', '#6bc5ff'][Math.floor(Math.random() * 4)];
+                particle.style.borderRadius = '50%';
+                particle.style.zIndex = '5';
+                particle.style.pointerEvents = 'none';
                 
-                // Create error text
-                const errorText = document.createElement('div');
-                errorText.innerHTML = `
-                    <div style="text-align: center; max-width: 700px;">
-                        <div style="font-size: 5rem; margin-bottom: 30px; color: #ff6b6b;">
-                            <i class="fas fa-times-circle"></i>
-                        </div>
-                        <h1 style="color: #ff6b6b; font-size: 2.8rem; margin-bottom: 20px; text-shadow: 0 0 20px rgba(255, 107, 107, 0.5);">
-                            IDENTITY REJECTED
-                        </h1>
-                        <p style="color: #c9d1d9; font-size: 1.5rem; margin-bottom: 20px;">
-                            The cube does not recognize you.
-                        </p>
-                        <p style="color: #ffd93d; font-size: 1.2rem; margin-bottom: 30px;">
-                            Only the chosen one may proceed.<br>
-                            All other identities are rejected.
-                        </p>
-                        <p style="color: #6bc5ff; font-size: 1rem; font-style: italic;">
-                            WARNING: The cube remembers rejected attempts.<br>
-                            Too many failures may trigger security protocols.
-                        </p>
-                    </div>
-                `;
+                // Random starting position
+                const startX = Math.random() * window.innerWidth;
+                const startY = Math.random() * window.innerHeight;
+                particle.style.left = `${startX}px`;
+                particle.style.top = `${startY}px`;
                 
-                // Create close button
-                const closeButton = document.createElement('button');
-                closeButton.textContent = 'TRY AGAIN';
-                closeButton.style.marginTop = '40px';
-                closeButton.style.padding = '15px 40px';
-                closeButton.style.fontSize = '1.2rem';
-                closeButton.style.backgroundColor = '#ff6b6b';
-                closeButton.style.color = '#0d1117';
-                closeButton.style.border = 'none';
-                closeButton.style.borderRadius = '8px';
-                closeButton.style.cursor = 'pointer';
-                closeButton.style.fontWeight = 'bold';
-                closeButton.style.letterSpacing = '1px';
-                closeButton.style.boxShadow = '0 0 20px rgba(255, 107, 107, 0.5)';
-                closeButton.addEventListener('click', function() {
-                    document.body.removeChild(errorOverlay);
+                document.body.appendChild(particle);
+                
+                // Animate particle
+                particle.animate([
+                    { 
+                        transform: 'translate(0, 0) scale(1)',
+                        opacity: 1
+                    },
+                    { 
+                        transform: `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) scale(0)`,
+                        opacity: 0
+                    }
+                ], {
+                    duration: 1000 + Math.random() * 1000,
+                    easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'
                 });
                 
-                // Add elements to overlay
-                errorOverlay.appendChild(errorText);
-                errorOverlay.appendChild(closeButton);
-                
-                // Add overlay to body
-                document.body.appendChild(errorOverlay);
-                
-                // Clear input field
-                document.getElementById('identityInput').value = '';
-                document.getElementById('identityInput').focus();
+                // Remove particle after animation
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                }, 2000);
             }
             
-            // WARNING: Time acceleration effect - cubes move faster when timer is revealed
             function accelerateCubes() {
                 const cubes = document.querySelectorAll('.floating-cube');
                 cubes.forEach(cube => {
@@ -867,17 +1034,8 @@
                     const newDuration = animationDuration * 0.7;
                     cube.style.animationDuration = `${newDuration}s`;
                 });
-                
-                // Update footer warning
-                const warning = document.querySelector('footer .hidden-warnings');
-                if (warning) {
-                    warning.textContent = 'WARNING: Time distortion active. Cube velocity increased by 30%. Convergence approaches.';
-                    warning.style.display = 'block';
-                    warning.style.color = '#4ade80';
-                }
             }
             
-            // WARNING: The cube monitors input patterns
             // Add visual feedback for identity input
             const identityInput = document.getElementById('identityInput');
             identityInput.addEventListener('input', function() {
@@ -890,26 +1048,22 @@
                 }
             });
             
-            // WARNING: The floating cubes change behavior based on time remaining
-            // Periodically update cube colors
+            // Randomly update floating cube colors
             setInterval(() => {
                 const cubes = document.querySelectorAll('.floating-cube');
                 cubes.forEach(cube => {
-                    if (Math.random() > 0.85) {
+                    if (Math.random() > 0.9) {
                         const hue = Math.floor(Math.random() * 360);
-                        cube.style.filter = `hue-rotate(${hue}deg) drop-shadow(0 0 10px rgba(157, 78, 221, 0.4))`;
+                        cube.style.filter = `hue-rotate(${hue}deg) drop-shadow(0 0 8px rgba(157, 78, 221, 0.4))`;
                     }
                 });
-            }, 2000);
+            }, 3000);
+            
+            // Add subtle placeholder typing effect
+            setTimeout(() => {
+                identityInput.placeholder = "enter name";
+            }, 1000);
         });
-        
-        // WARNING: Console reveals identity protocols
-        // Accepted identities: "Nkandu", "Rubix Cube"
-        // Convergence: December 27, 2025 at 00:00:00 UTC
-        console.log("HBD - IDENTITY VERIFICATION ACTIVE");
-        console.log("Accepted identities: 'REDACTED', 'Rubix Cube' (case insensitive)");
-        console.log("Convergence timer target: December 27, 2025 00:00:00 UTC");
-        console.log("WARNING: Unauthorized access attempts are logged and monitored.");
     </script>
 </body>
 </html>

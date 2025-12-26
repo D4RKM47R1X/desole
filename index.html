@@ -541,8 +541,8 @@
 
         <main class="main-content">
             <div class="instructions">
-                <h1>You shall not pass</h1>
-                <p>Unless you enter the correct values to align the cube's gates. Each number represents a turn in the algorithm. Red aligns the edges, Yellow positions the corners, Blue rotates the centers. Fail and the cube resets. (Hologram purely decoration)</p>
+                <h1>Hello Anomaly</h1>
+                <p>Welcome back to the cube, you know the way in</p>
                 <div class="cube-visual">
                     <div class="cube-face front"></div>
                     <div class="cube-face back"></div>
@@ -551,8 +551,10 @@
                     <div class="cube-face top"></div>
                     <div class="cube-face bottom"></div>
                 </div>
-                <p class="hidden-warnings">WARNING: The cube has 43 quintillion permutations. Only one opens the gates.</p>
+                <p class="hidden-warnings">WARNING: trust your senses.</p>
             </div>
+            
+            <audio id="bgMusic" src="Grimes - Kill V. Maim (Instrumental).mp3"></audio>
 
             <div class="cube-gates-container">
                 <div class="gate-box red">
@@ -599,7 +601,7 @@
                 <div class="stat">3 Gates</div>
                 <div class="stat">1 Solution</div>
             </div>
-            <p class="hidden-warnings">WARNING: The cube resets with wrong inputs. The algorithm must be perfect.</p>
+            <p class="hidden-warnings">Caution: The cube resets with wrong inputs. The algorithm must be perfect.</p>
         </footer>
     </div>
 
@@ -622,6 +624,20 @@
                 }
             });
             
+            window.addEventListener('load', () => {
+            const audio = document.getElementById('bgMusic');
+  
+            // Try to autoplay
+            audio.play().catch(() => {
+            console.log('Autoplay blocked - will play after user clicks page');
+    
+            // Play when user clicks anywhere
+                document.addEventListener('click', () => {
+                audio.play();
+            }, { once: true }); // Only trigger once
+            });
+            });
+
             // Add cube pieces colors dynamically
             const cubeFaces = document.querySelectorAll('.cube-face');
             cubeFaces.forEach(face => {

@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubix Gates | Code Matrix</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* WARNING: The final matrix requires precise alignment. Six digits, one code. */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+
+        :root {
+            --dark-bg: #0a0a0f;
+            --glass-border: rgba(255, 255, 255, 0.07);
+            --glass-bg: rgba(15, 15, 25, 0.85);
+            --purple: #6d28d9;
+            --purple-glow: #8b5cf6;
+            --green: #10b981;
+            --red: #ef4444;
+            --yellow: #fbbf24;
+            --blue: #3b82f6;
+            --matrix-green: #00ff41;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #d1d5db;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(109, 40, 217, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(109, 40, 217, 0.02) 0%, transparent 50%),
+                repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 255, 65, 0.02) 1px, rgba(0, 255, 65, 0.02) 2px);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .logo i {
+            color: var(--purple);
+            animation: rotate-cube 20s linear infinite;
+        }
+
+        @keyframes rotate-cube {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .matrix-badge {
+            background-color: rgba(0, 255, 65, 0.05);
+            border: 1px solid rgba(0, 255, 65, 0.1);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .matrix-badge i {
+            color: var(--matrix-green);
+        }
+
+        /* Matrix text display */
+        .matrix-text {
+            background: rgba(10, 10, 15, 0.9);
+            border: 1px solid var(--glass-border);
+            border-radius: 4px;
+            padding: 25px;
+            margin-bottom: 40px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            text-align: center;
+            letter-spacing: 1px;
+            color: rgba(0, 255, 65, 0.8);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .matrix-text::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--matrix-green), transparent);
+        }
+
+        .matrix-line {
+            margin-bottom: 5px;
+        }
+
+        /* Code matrix input */
+        .code-matrix-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 40px;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-matrix-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--purple), transparent);
+        }
+
+        .matrix-instruction {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 1px;
+        }
+
+        .matrix-grid {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .matrix-input {
+            width: 70px;
+            height: 70px;
+            background: rgba(10, 10, 15, 0.8);
+            border: 2px solid var(--glass-border);
+            border-radius: 6px;
+            font-size: 2.5rem;
+            color: var(--matrix-green);
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .matrix-input:focus {
+            outline: none;
+            border-color: var(--matrix-green);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            transform: scale(1.05);
+        }
+
+        .matrix-input.filled {
+            border-color: var(--purple);
+            box-shadow: 0 0 15px rgba(109, 40, 217, 0.3);
+        }
+
+        /* Activation code section */
+        .activation-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .activation-label {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 1px;
+        }
+
+        .activation-input {
+            width: 100%;
+            max-width: 300px;
+            background: rgba(10, 10, 15, 0.8);
+            border: 2px solid var(--glass-border);
+            border-radius: 6px;
+            padding: 15px;
+            font-size: 1.3rem;
+            color: #d1d5db;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            transition: all 0.3s;
+        }
+
+        .activation-input:focus {
+            outline: none;
+            border-color: var(--purple);
+            box-shadow: 0 0 20px rgba(109, 40, 217, 0.3);
+        }
+
+        .activate-btn {
+            background: linear-gradient(90deg, rgba(109, 40, 217, 0.7), rgba(139, 92, 246, 0.7));
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(109, 40, 217, 0.3);
+            border-radius: 6px;
+            padding: 18px 45px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            cursor: not-allowed;
+            transition: all 0.3s;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .activate-btn.active {
+            background: linear-gradient(90deg, var(--green), #10b981);
+            color: white;
+            border-color: rgba(16, 185, 129, 0.5);
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .activate-btn.active:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 35px rgba(16, 185, 129, 0.5);
+        }
+
+        .activate-btn.active:active {
+            transform: translateY(0);
+        }
+
+        /* Status indicators */
+        .status-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .status {
+            background: rgba(10, 10, 15, 0.7);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status i {
+            font-size: 0.8rem;
+        }
+
+        .status.matrix {
+            border-color: rgba(0, 255, 65, 0.3);
+            color: rgba(0, 255, 65, 0.8);
+        }
+
+        .status.code {
+            border-color: rgba(109, 40, 217, 0.3);
+            color: rgba(109, 40, 217, 0.8);
+        }
+
+        /* Error message */
+        .error-message {
+            color: var(--red);
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* Success overlay */
+        .success-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 15, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+            font-family: 'Courier New', monospace;
+        }
+
+        .success-content {
+            text-align: center;
+            max-width: 700px;
+            padding: 40px;
+            background: rgba(15, 15, 25, 0.9);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .success-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--green), transparent);
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--green);
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .success-title {
+            font-size: 2.5rem;
+            color: var(--green);
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+        }
+
+        .success-message {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        /* Floating elements */
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .float-element {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            opacity: 0.1;
+            color: var(--matrix-green);
+            font-size: 1.5rem;
+            font-weight: bold;
+            animation-timing-function: linear;
+        }
+
+        .float1 { 
+            animation: floatPath1 30s linear infinite;
+        }
+        .float2 { 
+            animation: floatPath2 35s linear infinite;
+        }
+        .float3 { 
+            animation: floatPath3 40s linear infinite;
+        }
+        .float4 { 
+            animation: floatPath4 45s linear infinite;
+        }
+        .float5 { 
+            animation: floatPath5 50s linear infinite;
+        }
+
+        @keyframes floatPath1 {
+            0% { top: 10%; left: 5%; transform: rotate(0deg); }
+            25% { top: 80%; left: 90%; transform: rotate(90deg); }
+            50% { top: 60%; left: 10%; transform: rotate(180deg); }
+            75% { top: 20%; left: 85%; transform: rotate(270deg); }
+            100% { top: 10%; left: 5%; transform: rotate(360deg); }
+        }
+
+        @keyframes floatPath2 {
+            0% { top: 80%; left: 90%; transform: rotate(45deg); }
+            25% { top: 20%; left: 10%; transform: rotate(135deg); }
+            50% { top: 10%; left: 80%; transform: rotate(225deg); }
+            75% { top: 70%; left: 20%; transform: rotate(315deg); }
+            100% { top: 80%; left: 90%; transform: rotate(405deg); }
+        }
+
+        @keyframes floatPath3 {
+            0% { top: 60%; left: 20%; transform: rotate(90deg); }
+            25% { top: 30%; left: 80%; transform: rotate(180deg); }
+            50% { top: 80%; left: 40%; transform: rotate(270deg); }
+            75% { top: 20%; left: 70%; transform: rotate(360deg); }
+            100% { top: 60%; left: 20%; transform: rotate(450deg); }
+        }
+
+        @keyframes floatPath4 {
+            0% { top: 30%; left: 70%; transform: rotate(180deg); }
+            25% { top: 70%; left: 30%; transform: rotate(270deg); }
+            50% { top: 20%; left: 90%; transform: rotate(360deg); }
+            75% { top: 85%; left: 15%; transform: rotate(450deg); }
+            100% { top: 30%; left: 70%; transform: rotate(540deg); }
+        }
+
+        @keyframes floatPath5 {
+            0% { top: 85%; left: 15%; transform: rotate(270deg); }
+            25% { top: 15%; left: 85%; transform: rotate(360deg); }
+            50% { top: 70%; left: 60%; transform: rotate(450deg); }
+            75% { top: 40%; left: 30%; transform: rotate(540deg); }
+            100% { top: 85%; left: 15%; transform: rotate(630deg); }
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid var(--glass-border);
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 1px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .code-matrix-container {
+                padding: 25px 15px;
+            }
+            
+            .matrix-input {
+                width: 55px;
+                height: 55px;
+                font-size: 2rem;
+            }
+            
+            .matrix-text {
+                padding: 15px;
+                font-size: 0.9rem;
+            }
+            
+            .matrix-instruction {
+                font-size: 1.1rem;
+            }
+            
+            .activation-input {
+                max-width: 250px;
+                font-size: 1.1rem;
+            }
+            
+            .activate-btn {
+                padding: 15px 35px;
+                font-size: 1.1rem;
+            }
+            
+            .success-content {
+                padding: 25px;
+                margin: 15px;
+            }
+            
+            .success-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .matrix-grid {
+                gap: 10px;
+            }
+            
+            .matrix-input {
+                width: 45px;
+                height: 45px;
+                font-size: 1.7rem;
+            }
+            
+            .status-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- WARNING: The matrix requires six single digits. The code unlocks the final sequence. -->
+    
+    <div class="floating-elements">
+        <div class="float-element float1">0</div>
+        <div class="float-element float2">1</div>
+        <div class="float-element float3">1</div>
+        <div class="float-element float4">0</div>
+        <div class="float-element float5">1</div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-cube"></i>
+                <span>FINAL MATRIX</span>
+            </div>
+            <div class="matrix-badge">
+                <i class="fas fa-lock"></i>
+                <span>Code Sequence Required</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="matrix-text">
+                <div class="matrix-line">MMTNMI DADBEH AIBTIY IDBTDU</div>
+                <div class="matrix-line">OISETM IIEOMW MSAHWM EAAOPB</div>
+                <div class="matrix-line">ITNETS OIWGHL CTIRYP OALNIA</div>
+                <div class="matrix-line">MEMNNG BGXASE BANAXS YXOODA</div>
+            </div>
+
+            <div class="code-matrix-container">
+                <div class="matrix-instruction">ENTER THE 6-DIGIT CODE</div>
+                
+                <div class="matrix-grid">
+                    <input type="text" maxlength="1" class="matrix-input" id="digit1" data-next="digit2">
+                    <input type="text" maxlength="1" class="matrix-input" id="digit2" data-next="digit3">
+                    <input type="text" maxlength="1" class="matrix-input" id="digit3" data-next="digit4">
+                    <input type="text" maxlength="1" class="matrix-input" id="digit4" data-next="digit5">
+                    <input type="text" maxlength="1" class="matrix-input" id="digit5" data-next="digit6">
+                    <input type="text" maxlength="1" class="matrix-input" id="digit6">
+                </div>
+                
+                <div class="activation-section">
+                    <div class="activation-label">ACTIVATION CODE</div>
+                    <input type="text" class="activation-input" id="activationCode" placeholder="ENTER CODE" maxlength="6">
+                    <div class="error-message" id="errorMessage">INVALID CODE</div>
+                    
+                    <button class="activate-btn" id="activateBtn" disabled>
+                        <i class="fas fa-key"></i> ACTIVATE MATRIX
+                    </button>
+                </div>
+            </div>
+
+            <div class="status-container">
+                <div class="status matrix">
+                    <i class="fas fa-microchip"></i>
+                    <span>MATRIX: <span id="matrixStatus">INCOMPLETE</span></span>
+                </div>
+                <div class="status code">
+                    <i class="fas fa-lock"></i>
+                    <span>CODE: <span id="codeStatus">REQUIRED</span></span>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div>FINAL SEQUENCE &copy; <span id="currentYear"></span> | MATRIX ALIGNMENT REQUIRED</div>
+        </footer>
+    </div>
+
+    <!-- Success overlay -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-content">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1 class="success-title">MATRIX ACTIVATED</h1>
+            <p class="success-message">
+                The code matrix has been successfully synchronized.<br>
+                Final sequence alignment complete.<br>
+                <span id="enteredCodeDisplay"></span>
+            </p>
+            <div class="matrix-badge" style="margin-bottom: 30px;">
+                <i class="fas fa-unlock"></i>
+                <span>FINAL GATE UNLOCKED</span>
+            </div>
+            <button class="activate-btn active" id="continueBtn">
+                <i class="fas fa-arrow-right"></i> PROCEED
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current year in footer
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            
+            // Get all elements
+            const matrixInputs = document.querySelectorAll('.matrix-input');
+            const activationInput = document.getElementById('activationCode');
+            const activateBtn = document.getElementById('activateBtn');
+            const errorMessage = document.getElementById('errorMessage');
+            const matrixStatus = document.getElementById('matrixStatus');
+            const codeStatus = document.getElementById('codeStatus');
+            const successOverlay = document.getElementById('successOverlay');
+            const enteredCodeDisplay = document.getElementById('enteredCodeDisplay');
+            const continueBtn = document.getElementById('continueBtn');
+            
+            // Track entered digits
+            let enteredDigits = ['', '', '', '', '', ''];
+            
+            // Set up matrix digit inputs
+            matrixInputs.forEach((input, index) => {
+                // Focus management
+                input.addEventListener('input', function(e) {
+                    const value = this.value;
+                    
+                    // Only allow digits
+                    if (!/^\d*$/.test(value)) {
+                        this.value = '';
+                        enteredDigits[index] = '';
+                        updateMatrixStatus();
+                        return;
+                    }
+                    
+                    // Store the digit
+                    enteredDigits[index] = value;
+                    
+                    // Add visual feedback
+                    if (value) {
+                        this.classList.add('filled');
+                    } else {
+                        this.classList.remove('filled');
+                    }
+                    
+                    // Auto-advance to next input
+                    if (value && this.dataset.next) {
+                        document.getElementById(this.dataset.next).focus();
+                    }
+                    
+                    updateMatrixStatus();
+                });
+                
+                // Handle backspace
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && !this.value && this.previousElementSibling && 
+                        this.previousElementSibling.classList.contains('matrix-input')) {
+                        this.previousElementSibling.focus();
+                    }
+                });
+                
+                // Handle paste
+                input.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const pastedData = e.clipboardData.getData('text').trim();
+                    
+                    // Check if pasting multiple digits
+                    if (pastedData.length > 1 && /^\d+$/.test(pastedData)) {
+                        // Fill all inputs with pasted digits
+                        const digits = pastedData.split('').slice(0, 6);
+                        matrixInputs.forEach((input, idx) => {
+                            if (digits[idx]) {
+                                input.value = digits[idx];
+                                enteredDigits[idx] = digits[idx];
+                                input.classList.add('filled');
+                            }
+                        });
+                        updateMatrixStatus();
+                        
+                        // Focus last filled input or activation
+                        const lastFilledIndex = digits.length - 1;
+                        if (lastFilledIndex < 5) {
+                            matrixInputs[lastFilledIndex + 1].focus();
+                        } else {
+                            activationInput.focus();
+                        }
+                    }
+                });
+            });
+            
+            // Set up activation code input
+            activationInput.addEventListener('input', function() {
+                const value = this.value.toUpperCase();
+                this.value = value;
+                
+                // Update status
+                if (value === 'BEHAVE') {
+                    codeStatus.textContent = 'VALID';
+                    codeStatus.style.color = '#10b981';
+                    
+                    // Enable button only if all digits are filled
+                    const allDigitsFilled = enteredDigits.every(digit => digit !== '');
+                    if (allDigitsFilled) {
+                        activateBtn.disabled = false;
+                        activateBtn.classList.add('active');
+                    }
+                } else {
+                    codeStatus.textContent = 'INVALID';
+                    codeStatus.style.color = '#ef4444';
+                    activateBtn.disabled = true;
+                    activateBtn.classList.remove('active');
+                }
+                
+                // Hide error message when typing
+                errorMessage.style.display = 'none';
+            });
+            
+            // Activate button click
+            activateBtn.addEventListener('click', function() {
+                const activationCode = activationInput.value.toUpperCase();
+                
+                // Verify activation code
+                if (activationCode === 'BEHAVE') {
+                    // Verify all digits are filled
+                    const allDigitsFilled = enteredDigits.every(digit => digit !== '');
+                    
+                    if (allDigitsFilled) {
+                        // Show success
+                        const enteredCode = enteredDigits.join('');
+                        enteredCodeDisplay.textContent = `Code: ${enteredCode}`;
+                        successOverlay.style.display = 'flex';
+                        
+                        // Create celebration effect
+                        createMatrixCelebration();
+                    } else {
+                        showError('COMPLETE ALL 6 DIGITS');
+                    }
+                } else {
+                    showError('INVALID ACTIVATION CODE');
+                }
+            });
+            
+            // Continue button (in success overlay)
+            continueBtn.addEventListener('click', function() {
+                // Here you would redirect to the next page
+                // For now, just close the overlay and show a message
+                successOverlay.style.display = 'none';
+                
+                // Create final animation
+                createFinalAnimation();
+            });
+            
+            // Update matrix status
+            function updateMatrixStatus() {
+                const filledCount = enteredDigits.filter(digit => digit !== '').length;
+                
+                if (filledCount === 6) {
+                    matrixStatus.textContent = 'COMPLETE';
+                    matrixStatus.style.color = '#10b981';
+                    
+                    // If activation code is also valid, enable button
+                    if (activationInput.value.toUpperCase() === 'BEHAVE') {
+                        activateBtn.disabled = false;
+                        activateBtn.classList.add('active');
+                    }
+                } else if (filledCount > 0) {
+                    matrixStatus.textContent = `PARTIAL (${filledCount}/6)`;
+                    matrixStatus.style.color = '#fbbf24';
+                } else {
+                    matrixStatus.textContent = 'INCOMPLETE';
+                    matrixStatus.style.color = '#ef4444';
+                }
+            }
+            
+            // Show error message
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+                errorMessage.style.animation = 'none';
+                void errorMessage.offsetWidth; // Trigger reflow
+                errorMessage.style.animation = 'shake 0.5s';
+                
+                // Shake activation input
+                activationInput.style.animation = 'none';
+                void activationInput.offsetWidth;
+                activationInput.style.animation = 'shake 0.5s';
+                
+                // Auto-hide error after 3 seconds
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 3000);
+            }
+            
+            // Create matrix celebration effect
+            function createMatrixCelebration() {
+                // Change floating elements to matrix green
+                const floatElements = document.querySelectorAll('.float-element');
+                floatElements.forEach(el => {
+                    el.style.color = '#00ff41';
+                    el.style.opacity = '0.3';
+                    el.style.fontSize = '2rem';
+                    
+                    // Speed up animations
+                    const style = window.getComputedStyle(el);
+                    const animationDuration = parseFloat(style.animationDuration);
+                    el.style.animationDuration = `${animationDuration * 0.3}s`;
+                });
+                
+                // Create falling digit effect
+                for (let i = 0; i < 30; i++) {
+                    setTimeout(() => {
+                        createFallingDigit();
+                    }, i * 100);
+                }
+            }
+            
+            // Create falling digit animation
+            function createFallingDigit() {
+                const digit = document.createElement('div');
+                digit.textContent = Math.floor(Math.random() * 10);
+                digit.style.position = 'fixed';
+                digit.style.top = '-30px';
+                digit.style.left = `${Math.random() * 100}%`;
+                digit.style.color = '#00ff41';
+                digit.style.fontSize = `${Math.random() * 20 + 15}px`;
+                digit.style.fontFamily = "'Courier New', monospace";
+                digit.style.fontWeight = 'bold';
+                digit.style.opacity = '0.7';
+                digit.style.zIndex = '5';
+                digit.style.pointerEvents = 'none';
+                digit.style.textShadow = '0 0 10px #00ff41';
+                
+                document.body.appendChild(digit);
+                
+                // Animate falling
+                const duration = 2000 + Math.random() * 2000;
+                digit.animate([
+                    { 
+                        transform: 'translateY(0) rotate(0deg)',
+                        opacity: 0.8
+                    },
+                    { 
+                        transform: `translateY(${window.innerHeight + 50}px) rotate(${Math.random() * 360}deg)`,
+                        opacity: 0
+                    }
+                ], {
+                    duration: duration,
+                    easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'
+                });
+                
+                // Remove after animation
+                setTimeout(() => {
+                    if (digit.parentNode) {
+                        digit.parentNode.removeChild(digit);
+                    }
+                }, duration);
+            }
+            
+            // Create final animation
+            function createFinalAnimation() {
+                // Create full-screen matrix effect
+                const matrixContainer = document.createElement('div');
+                matrixContainer.style.position = 'fixed';
+                matrixContainer.style.top = '0';
+                matrixContainer.style.left = '0';
+                matrixContainer.style.width = '100%';
+                matrixContainer.style.height = '100%';
+                matrixContainer.style.background = 'rgba(10, 10, 15, 0.95)';
+                matrixContainer.style.display = 'flex';
+                matrixContainer.style.justifyContent = 'center';
+                matrixContainer.style.alignItems = 'center';
+                matrixContainer.style.zIndex = '1001';
+                matrixContainer.style.fontFamily = "'Courier New', monospace";
+                matrixContainer.style.color = '#00ff41';
+                matrixContainer.style.fontSize = '3rem';
+                matrixContainer.style.fontWeight = 'bold';
+                matrixContainer.style.textShadow = '0 0 20px #00ff41';
+                matrixContainer.style.letterSpacing = '5px';
+                
+                // Show the entered code
+                const enteredCode = enteredDigits.join('');
+                matrixContainer.textContent = `FINAL CODE: ${enteredCode}`;
+                
+                document.body.appendChild(matrixContainer);
+                
+                // Flash and redirect
+                setTimeout(() => {
+                    matrixContainer.style.animation = 'pulse 0.5s';
+                    
+                    setTimeout(() => {
+                        // Here you would redirect to the next page
+                        // For demonstration, just remove the overlay
+                        document.body.removeChild(matrixContainer);
+                        
+                        // Show completion message
+                        alert('FINAL SEQUENCE COMPLETE. The matrix has been activated.');
+                    }, 1000);
+                }, 2000);
+            }
+            
+            // Add placeholder typing effect to activation input
+            setTimeout(() => {
+                let placeholderText = '';
+                const fullPlaceholder = 'RE-ENTER CODE';
+                let placeholderIndex = 0;
+                
+                function typePlaceholder() {
+                    if (placeholderIndex < fullPlaceholder.length) {
+                        placeholderText += fullPlaceholder.charAt(placeholderIndex);
+                        activationInput.placeholder = placeholderText;
+                        placeholderIndex++;
+                        setTimeout(typePlaceholder, 100);
+                    }
+                }
+                
+                typePlaceholder();
+            }, 1500);
+            
+            // Randomly update floating elements
+            setInterval(() => {
+                const floatElements = document.querySelectorAll('.float-element');
+                floatElements.forEach(el => {
+                    if (Math.random() > 0.95) {
+                        el.textContent = Math.floor(Math.random() * 10);
+                        el.style.opacity = Math.random() > 0.5 ? '0.15' : '0.25';
+                    }
+                });
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
